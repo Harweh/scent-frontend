@@ -91,14 +91,21 @@ export default function AdminFragrancesPage() {
     return (
         <main className="bg-[#100E0B] min-h-screen text-[#F5EFE6]">
         <section className="border-b border-white/10">
-            <div className="max-w-6xl mx-auto px-6 sm:px-8 py-8 flex items-center justify-between">
+            <div className="max-w-6xl mx-auto px-6 sm:px-8 py-8">
+            <div className="flex gap-6 text-xs uppercase tracking-[0.15em] mb-6">
+                <Link href="/admin" className="text-[#F5EFE6]/40 hover:text-[#B8924A] pb-3">Dashboard</Link>
+                <Link href="/admin/orders" className="text-[#F5EFE6]/40 hover:text-[#B8924A] pb-3">Orders</Link>
+                <Link href="/admin/customers" className="text-[#F5EFE6]/40 hover:text-[#B8924A] pb-3">Customers</Link>
+                <span className="text-[#B8924A] border-b-2 border-[#B8924A] pb-3">Fragrances</span>
+            </div>
+            <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-                <Link href="/admin" className="text-xs text-[#F5EFE6]/30 hover:text-[#B8924A] uppercase tracking-[0.1em] transition-colors">← Dashboard</Link>
                 <h1 className="font-[family-name:var(--font-display)] text-2xl sm:text-3xl">Fragrances</h1>
             </div>
             <button onClick={openCreate} className="bg-[#B8924A] text-[#100E0B] px-5 py-2.5 text-xs uppercase tracking-[0.12em] hover:bg-[#C9A45A] transition-colors">
                 + New
             </button>
+            </div>
             </div>
         </section>
 

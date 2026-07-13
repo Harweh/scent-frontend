@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { apiFetch } from '@/lib/api'
 
 const ADMIN_SECRET  = process.env.NEXT_PUBLIC_ADMIN_SECRET || 'aura-admin-2026'
@@ -21,10 +21,13 @@ const statusColor = s => ({
 
     export default function AdminOrdersPage() {
     const router = useRouter()
+    const searchParams = useSearchParams()
     const [orders,     setOrders]     = useState([])
     const [loading,    setLoading]    = useState(true)
     const [search,     setSearch]     = useState('')
-    const [statusFilter, setStatusFilter] = useState('all')
+    const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'all')
+    const [startDate,  setStartDate]  = useState('')
+    const [endDate,    setEndDate]    = useState('')
     const [updatingId, setUpdatingId] = useState(null)
 
     useEffect(() => {
@@ -33,12 +36,16 @@ const statusColor = s => ({
         return
         }
         load()
-    }, [])
+    }, [startDate, endDate])
 
     async function load() {
         setLoading(true)
         try {
-        const data = await apiFetch('/api/orders', { headers: adminHeaders() })
+        const params = new URLSearchParams()
+        if (startDate) params.set('startDate', startDate)
+        if (endDate) params.set('endDate', endDate)
+        const qs = params.toString()
+        const data = await apiFetch(`/api/orders${qs ? `?${qs}` : ''}`, { headers: adminHeaders() })
         if (data.success) setOrders(data.data)
         } catch (err) { console.error(err) }
         finally { setLoading(false) }
@@ -81,11 +88,14 @@ const statusColor = s => ({
         <main className="bg-[#100E0B] min-h-screen text-[#F5EFE6]">
         <section className="border-b border-white/10">
             <div className="max-w-7xl mx-auto px-6 sm:px-8 py-8">
+            <div className="flex gap-6 text-xs uppercase tracking-[0.15em] mb-6">
+                <Link href="/admin" className="text-[#F5EFE6]/40 hover:text-[#B8924A] pb-3">Dashboard</Link>
+                <span className="text-[#B8924A] border-b-2 border-[#B8924A] pb-3">Orders</span>
+                <Link href="/admin/customers" className="text-[#F5EFE6]/40 hover:text-[#B8924A] pb-3">Customers</Link>
+                <Link href="/admin/fragrances" className="text-[#F5EFE6]/40 hover:text-[#B8924A] pb-3">Fragrances</Link>
+            </div>
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-4">
-                <Link href="/admin" className="text-xs text-[#F5EFE6]/30 hover:text-[#B8924A] uppercase tracking-[0.1em] transition-colors">
-                    ← Dashboard
-                </Link>
                 <h1 className="font-[family-name:var(--font-display)] text-2xl sm:text-3xl">All Orders</h1>
                 </div>
                 <p className="text-xs text-[#F5EFE6]/30 uppercase tracking-[0.1em]">{filtered.length} orders</p>
@@ -106,6 +116,19 @@ const statusColor = s => ({
                 <option value="all">All Statuses</option>
                 {ORDER_STATUSES.map(s => <option key={s} value={s} className="bg-[#1C1813]">{s}</option>)}
                 </select>
+                <div className="flex items-center gap-2">
+                <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
+                    className="bg-[#1C1813] border border-white/15 px-3 py-2.5 text-sm focus:outline-none focus:border-[#B8924A] [color-scheme:dark]" />
+                <span className="text-[#F5EFE6]/30 text-xs">to</span>
+                <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
+                    className="bg-[#1C1813] border border-white/15 px-3 py-2.5 text-sm focus:outline-none focus:border-[#B8924A] [color-scheme:dark]" />
+                {(startDate || endDate) && (
+                    <button onClick={() => { setStartDate(''); setEndDate('') }}
+                    className="text-xs text-[#F5EFE6]/30 hover:text-[#B8924A] uppercase tracking-[0.1em]">
+                    Clear
+                    </button>
+                )}
+                </div>
             </div>
             </div>
         </section>
