@@ -246,9 +246,9 @@ export default function ProductDetailPage() {
                 </div>
 
                 {/* Delivery info */}
-                <p className="text-xs text-[#F5EFE6]/25 border-t border-white/10 pt-6">
+                {/* <p className="text-xs text-[#F5EFE6]/25 border-t border-white/10 pt-6">
                 Lagos delivery ₦1,500 · National ₦3,500 · International ₦15,000
-                </p>
+                </p> */}
 
             </div>
             </div>
