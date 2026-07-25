@@ -146,7 +146,8 @@ const STATUS_STYLES = {
 
                     <div className="border-t border-white/10 pt-4 flex items-center justify-between">
                         <span className={`text-xs uppercase tracking-[0.1em] ${paymentColor}`}>
-                        {order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Paid Online'} · {order.paymentStatus}
+                        {/* {order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Paid Online'} · {order.paymentStatus} */}
+                        {order.paymentMethod === 'cod' ? '💵 Cash on Delivery' : '💳 Online Payment'} · {order.paymentStatus}
                         </span>
                         <span className="font-[family-name:var(--font-display)] text-xl text-[#B8924A]">
                         ₦{order.totalAmount?.toLocaleString()}
