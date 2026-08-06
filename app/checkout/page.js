@@ -343,6 +343,87 @@
 // }
 
 
+// async function handleSubmit(e) {
+//         e.preventDefault()
+//         if (items.length === 0) { setError('Your cart is empty.'); return }
+
+//         const outOfStock = items.filter(i => i.inStock === false)
+//         if (outOfStock.length > 0) {
+//             setError(`Remove out of stock items before checking out: ${outOfStock.map(i => i.name).join(', ')}`)
+//             return
+//         }
+//         setSubmitting(true)
+//         setError('')
+
+//         // Detect if any item is an AI blend
+//         const blendItem    = items.find(i => i.isBlend)
+//         const purchaseType = blendItem ? 'ai_match' : 'as_is'
+
+//         // Build notes array — for blends use the stored blend notes, not the flat cart item
+//         const notes = blendItem
+//             ? (blendItem.blendNotes || blendItem.blendRecipe?.recipe?.map(r => ({
+//                 fragranceId: r.note,
+//                 name:        r.note,
+//                 emoji:       r.emoji,
+//                 pricePerMl:  0,
+//                 mlUsed:      r.volumeMl || 2,
+//                 role:        r.role,
+//                 percentage:  r.percentageNum || 0,
+//               })) || [])
+//             : items.map(item => ({
+//                 fragranceId: item.fragranceId,
+//                 name:        item.name,
+//                 emoji:       item.emoji,
+//                 pricePerMl:  item.pricePerMl,
+//                 mlUsed:      item.volume * item.qty,
+//               }))
+
+//         // For blend items the subtotal IS the totalAmount (isFlat=true)
+//         const fragranceCost = blendItem
+//             ? (blendItem.blendRecipe?.fragranceCost || subtotal)
+//             : subtotal
+
+//         try {
+//             const orderData = await apiFetch('/api/orders', {
+//                 method: 'POST',
+//                 headers: { 'Content-Type': 'application/json' },
+//                 body: JSON.stringify({
+//                     purchaseType,
+//                     deliveryZone,
+//                     notes,
+//                     fragranceCost,
+//                     paymentMethod:      form.paymentMethod,
+//                     scentDescription:   blendItem?.scentDescription   || '',
+//                     mixingInstructions: blendItem?.blendRecipe         || null,
+//                     customer: {
+//                         name:    form.name,
+//                         address: `${form.address}, ${form.state}`,
+//                         phone:   `${form.countryCode}${form.phone.replace(/^0+/, '')}`,
+//                         email:   form.email,
+//                     },
+//                 }),
+//             })
+//             if (!orderData.success) throw new Error(orderData.message || 'Order failed')
+
+//             if (form.paymentMethod === 'online') {
+//                 const payData = await apiFetch('/api/payment/initialize', {
+//                     method: 'POST',
+//                     headers: { 'Content-Type': 'application/json' },
+//                     body: JSON.stringify({ orderId: orderData.data._id, email: form.email }),
+//                 })
+//                 if (!payData.success) throw new Error(payData.message || 'Payment initialization failed')
+//                 clearCart()
+//                 window.location.href = payData.authorizationUrl
+//             } else {
+//                 clearCart()
+//                 router.push(`/orders?email=${encodeURIComponent(form.email)}`)
+//             }
+//         } catch (err) {
+//             setError(err.message)
+//             setSubmitting(false)
+//         }
+//     }
+
 async function handleSubmit(e) {
         e.preventDefault()
         if (items.length === 0) { setError('Your cart is empty.'); return }
@@ -355,33 +436,23 @@ async function handleSubmit(e) {
         setSubmitting(true)
         setError('')
 
-        // Detect if any item is an AI blend
         const blendItem    = items.find(i => i.isBlend)
         const purchaseType = blendItem ? 'ai_match' : 'as_is'
 
-        // Build notes array — for blends use the stored blend notes, not the flat cart item
+        // For blends — use the stored blendNotes (individual fragrance notes with ml/role/%)
+        // For regular items — map cart items to notes
         const notes = blendItem
-            ? (blendItem.blendNotes || blendItem.blendRecipe?.recipe?.map(r => ({
-                fragranceId: r.note,
-                name:        r.note,
-                emoji:       r.emoji,
-                pricePerMl:  0,
-                mlUsed:      r.volumeMl || 2,
-                role:        r.role,
-                percentage:  r.percentageNum || 0,
-              })) || [])
+            ? (blendItem.blendNotes || [])
             : items.map(item => ({
                 fragranceId: item.fragranceId,
                 name:        item.name,
                 emoji:       item.emoji,
                 pricePerMl:  item.pricePerMl,
                 mlUsed:      item.volume * item.qty,
-              }))
+            }))
 
-        // For blend items the subtotal IS the totalAmount (isFlat=true)
-        const fragranceCost = blendItem
-            ? (blendItem.blendRecipe?.fragranceCost || subtotal)
-            : subtotal
+        // fragranceCost — from stored pricing for blends, subtotal for regular
+        const fragranceCost = blendItem?.pricing?.fragranceCost ?? subtotal
 
         try {
             const orderData = await apiFetch('/api/orders', {

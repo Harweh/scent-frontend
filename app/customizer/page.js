@@ -38,29 +38,29 @@ const MOOD_PROMPTS = [
     const [result,      setResult]      = useState(null)
     const [added,       setAdded]       = useState(false)
 
-    async function handleSubmit(e) {
-        e.preventDefault()
-        if (description.trim().length < 5) {
-        setError('Tell us a little more about how you want to feel.')
-        return
-        }
-        setError('')
-        setLoading(true)
-        try {
-        const data  = await apiFetch('/api/ai/describe-match', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ description: description.trim(), gender, volume }),
-        })
-        if (!data.success) throw new Error(data.message || 'Something went wrong')
-        setResult(data)
-        setStep(2)
-        } catch (err) {
-        setError(err.message)
-        } finally {
-        setLoading(false)
-        }
-    }
+    // async function handleSubmit(e) {
+    //     e.preventDefault()
+    //     if (description.trim().length < 5) {
+    //     setError('Tell us a little more about how you want to feel.')
+    //     return
+    //     }
+    //     setError('')
+    //     setLoading(true)
+    //     try {
+    //     const data  = await apiFetch('/api/ai/describe-match', {
+    //         method: 'POST',
+    //         headers: { 'Content-Type': 'application/json' },
+    //         body: JSON.stringify({ description: description.trim(), gender, volume }),
+    //     })
+    //     if (!data.success) throw new Error(data.message || 'Something went wrong')
+    //     setResult(data)
+    //     setStep(2)
+    //     } catch (err) {
+    //     setError(err.message)
+    //     } finally {
+    //     setLoading(false)
+    //     }
+    // }
 
     function handleAddToCart() {
         if (!result) return
@@ -87,6 +87,44 @@ const MOOD_PROMPTS = [
         // Store notes for the order
         blendNotes:       result.mixingInstructions.recipe,
         totalMl:          result.mixingInstructions.totalVolumeMl,
+        })
+        setAdded(true)
+        setTimeout(() => setAdded(false), 2500)
+    }
+
+    function handleAddToCart() {
+        if (!result) return
+
+        const heart = result.mixingInstructions.recipe.find(f => f.role === 'Heart') 
+            || result.mixingInstructions.recipe[0]
+
+        addItem({
+            fragranceId:      `blend-${Date.now()}`,
+            name:             result.perfumeName,
+            emoji:            '🧪',
+            color:            heart?.color || '#B8924A',
+            imageUrl:         heart?.imageUrl || null,
+            pricePerMl:       result.pricing.totalAmount, // flat total
+            volume:           1,
+            qty:              1,
+            inStock:          true,
+            isBlend:          true,
+            isFlat:           true,
+            blendRecipe:      result.mixingInstructions,  // full mixing card
+            pricing:          result.pricing,              // ← ADD THIS
+            scentDescription: result.scentDescription,
+            blendNotes:       result.mixingInstructions.recipe.map(r => ({
+                fragranceId: r.note,
+                name:        r.note,
+                emoji:       r.emoji,
+                pricePerMl:  r.percentageNum 
+                    ? (result.pricing.fragranceCost * r.percentageNum / 100) / r.volumeMl 
+                    : 0,
+                mlUsed:      r.volumeMl,
+                role:        r.role,
+                percentage:  r.percentageNum || 0,
+            })),
+            totalMl: result.mixingInstructions.totalVolumeMl,
         })
         setAdded(true)
         setTimeout(() => setAdded(false), 2500)
