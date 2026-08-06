@@ -88,133 +88,62 @@
         return () => clearTimeout(timer)
     }, [form.address, form.state])
 
-    // async function handleSubmit(e) {
-    //     e.preventDefault()
-    //     if (items.length === 0) { setError('Your cart is empty.'); return }
-
-    //     const outOfStock = items.filter(i => i.inStock === false)
-    //     if (outOfStock.length > 0) {
-    //     setError(`Remove out of stock items before checking out: ${outOfStock.map(i => i.name).join(', ')}`)
-    //     return
-    //     }
-    //     setSubmitting(true)
-    //     setError('')
-
-    //     const notes = items.map(item => ({
-    //     fragranceId:  item.fragranceId,
-    //     name:         item.name,
-    //     emoji:        item.emoji,
-    //     pricePerMl:   item.pricePerMl,
-    //     mlUsed:       item.volume * item.qty,
-    //     }))
-
-    //     try {
-    //     const orderData = await apiFetch('/api/orders', {
-    //         method: 'POST',
-    //         headers: { 'Content-Type': 'application/json' },
-    //         body: JSON.stringify({
-    //         purchaseType: 'as_is',
-    //         deliveryZone,
-    //         notes,
-    //         fragranceCost: subtotal,
-    //         paymentMethod: form.paymentMethod,
-    //         customer: {
-    //             name:    form.name,
-    //             address: `${form.address}, ${form.state}`,
-    //             phone:   `${form.countryCode}${form.phone.replace(/^0+/, '')}`,
-    //             email:   form.email,
-    //         },
-    //         }),
-    //     })
-    //     if (!orderData.success) throw new Error(orderData.message || 'Order failed')
-
-    //     if (form.paymentMethod === 'online') {
-    //         const payData = await apiFetch('/api/payment/initialize', {
-    //         method: 'POST',
-    //         headers: { 'Content-Type': 'application/json' },
-    //         body: JSON.stringify({ orderId: orderData.data._id, email: form.email }),
-    //         })
-    //         if (!payData.success) throw new Error(payData.message || 'Payment initialization failed')
-    //         clearCart()
-    //         window.location.href = payData.authorizationUrl
-    //     } else {
-    //         clearCart()
-    //         router.push(`/orders?email=${encodeURIComponent(form.email)}`)
-    //     }
-    //     } catch (err) {
-    //     setError(err.message)
-    //     setSubmitting(false)
-    //     }
-    // }
-
     async function handleSubmit(e) {
         e.preventDefault()
         if (items.length === 0) { setError('Your cart is empty.'); return }
 
         const outOfStock = items.filter(i => i.inStock === false)
         if (outOfStock.length > 0) {
-            setError(`Remove out of stock items before checking out: ${outOfStock.map(i => i.name).join(', ')}`)
-            return
+        setError(`Remove out of stock items before checking out: ${outOfStock.map(i => i.name).join(', ')}`)
+        return
         }
         setSubmitting(true)
         setError('')
 
-        const blendItem    = items.find(i => i.isBlend)
-        const purchaseType = blendItem ? 'ai_match' : 'as_is'
-
-        // For blends — use the stored blendNotes (individual fragrance notes with ml/role/%)
-        // For regular items — map cart items to notes
-        const notes = blendItem
-            ? (blendItem.blendNotes || [])
-            : items.map(item => ({
-                fragranceId: item.fragranceId,
-                name:        item.name,
-                emoji:       item.emoji,
-                pricePerMl:  item.pricePerMl,
-                mlUsed:      item.volume * item.qty,
-            }))
-
-        // fragranceCost — from stored pricing for blends, subtotal for regular
-        const fragranceCost = blendItem?.pricing?.fragranceCost ?? subtotal
+        const notes = items.map(item => ({
+        fragranceId:  item.fragranceId,
+        name:         item.name,
+        emoji:        item.emoji,
+        pricePerMl:   item.pricePerMl,
+        mlUsed:       item.volume * item.qty,
+        }))
 
         try {
-            const orderData = await apiFetch('/api/orders', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    purchaseType,
-                    deliveryZone,
-                    notes,
-                    fragranceCost,
-                    paymentMethod:      form.paymentMethod,
-                    scentDescription:   blendItem?.scentDescription   || '',
-                    mixingInstructions: blendItem?.blendRecipe         || null,
-                    customer: {
-                        name:    form.name,
-                        address: `${form.address}, ${form.state}`,
-                        phone:   `${form.countryCode}${form.phone.replace(/^0+/, '')}`,
-                        email:   form.email,
-                    },
-                }),
-            })
-            if (!orderData.success) throw new Error(orderData.message || 'Order failed')
+        const orderData = await apiFetch('/api/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+            purchaseType: 'as_is',
+            deliveryZone,
+            notes,
+            fragranceCost: subtotal,
+            paymentMethod: form.paymentMethod,
+            customer: {
+                name:    form.name,
+                address: `${form.address}, ${form.state}`,
+                phone:   `${form.countryCode}${form.phone.replace(/^0+/, '')}`,
+                email:   form.email,
+            },
+            }),
+        })
+        if (!orderData.success) throw new Error(orderData.message || 'Order failed')
 
-            if (form.paymentMethod === 'online') {
-                const payData = await apiFetch('/api/payment/initialize', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ orderId: orderData.data._id, email: form.email }),
-                })
-                if (!payData.success) throw new Error(payData.message || 'Payment initialization failed')
-                clearCart()
-                window.location.href = payData.authorizationUrl
-            } else {
-                clearCart()
-                router.push(`/orders?email=${encodeURIComponent(form.email)}`)
-            }
+        if (form.paymentMethod === 'online') {
+            const payData = await apiFetch('/api/payment/initialize', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId: orderData.data._id, email: form.email }),
+            })
+            if (!payData.success) throw new Error(payData.message || 'Payment initialization failed')
+            clearCart()
+            window.location.href = payData.authorizationUrl
+        } else {
+            clearCart()
+            router.push(`/orders?email=${encodeURIComponent(form.email)}`)
+        }
         } catch (err) {
-            setError(err.message)
-            setSubmitting(false)
+        setError(err.message)
+        setSubmitting(false)
         }
     }
 
