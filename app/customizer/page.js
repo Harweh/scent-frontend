@@ -1,9 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
-// // app/customizer/page.js
-// export default function CustomizerPage() {
-//     return <div>Customizer page coming soon</div>
-// }
-
 'use client'
 
 import { useState } from 'react'
@@ -17,17 +11,17 @@ const MOOD_PROMPTS = [
     'Warm and cozy, like a candlelit evening at home',
     'Fresh and energized, like the first morning of spring',
     'Mysterious and seductive, for a night out in Lagos',
-    ]
+]
 
-    const GENDER_OPTIONS = [
+const GENDER_OPTIONS = [
     { value: 'unisex', label: 'No Preference' },
     { value: 'female', label: 'Feminine' },
     { value: 'male',   label: 'Masculine' },
-    ]
+]
 
-    const VOLUME_OPTIONS = [15, 30, 50, 100]
+const VOLUME_OPTIONS = [15, 30, 50, 100]
 
-    export default function BespokeLabPage() {
+export default function BespokeLabPage() {
     const { addItem } = useCart()
     const [step,        setStep]        = useState(1)
     const [description, setDescription] = useState('')
@@ -38,93 +32,63 @@ const MOOD_PROMPTS = [
     const [result,      setResult]      = useState(null)
     const [added,       setAdded]       = useState(false)
 
-    // async function handleSubmit(e) {
-    //     e.preventDefault()
-    //     if (description.trim().length < 5) {
-    //     setError('Tell us a little more about how you want to feel.')
-    //     return
-    //     }
-    //     setError('')
-    //     setLoading(true)
-    //     try {
-    //     const data  = await apiFetch('/api/ai/describe-match', {
-    //         method: 'POST',
-    //         headers: { 'Content-Type': 'application/json' },
-    //         body: JSON.stringify({ description: description.trim(), gender, volume }),
-    //     })
-    //     if (!data.success) throw new Error(data.message || 'Something went wrong')
-    //     setResult(data)
-    //     setStep(2)
-    //     } catch (err) {
-    //     setError(err.message)
-    //     } finally {
-    //     setLoading(false)
-    //     }
-    // }
+    async function handleSubmit(e) {
+        e.preventDefault()
+        if (description.trim().length < 5) {
+        setError('Tell us a little more about how you want to feel.')
+        return
+        }
+        setError('')
+        setLoading(true)
+        try {
+        const data = await apiFetch('/api/ai/describe-match', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ description: description.trim(), gender, volume }),
+        })
+        if (!data.success) throw new Error(data.message || 'Something went wrong')
+        setResult(data)
+        setStep(2)
+        } catch (err) {
+        setError(err.message)
+        } finally {
+        setLoading(false)
+        }
+    }
 
     function handleAddToCart() {
         if (!result) return
 
-        // Add as ONE flat-priced cart item — no per-ml calculation needed
-        // totalAmount already includes fragrance cost + mixing fee + vial
-        const heart = result.mixingInstructions.recipe.find(f => f.role === 'Heart') || result.mixingInstructions.recipe[0]
+        const heart = result.mixingInstructions.recipe.find(f => f.role === 'Heart')
+        || result.mixingInstructions.recipe[0]
+
         addItem({
         fragranceId:      `blend-${Date.now()}`,
         name:             result.perfumeName,
         emoji:            '🧪',
         color:            heart?.color || '#B8924A',
         imageUrl:         heart?.imageUrl || null,
-        // Store total as flat price: pricePerMl=totalAmount, volume=1, qty=1
-        // So cart total = totalAmount × 1 × 1 = totalAmount ✓
         pricePerMl:       result.pricing.totalAmount,
         volume:           1,
         qty:              1,
         inStock:          true,
         isBlend:          true,
-        isFlat:           true,  // flag so cart knows not to show /ml
+        isFlat:           true,
         blendRecipe:      result.mixingInstructions,
+        pricing:          result.pricing,
         scentDescription: result.scentDescription,
-        // Store notes for the order
-        blendNotes:       result.mixingInstructions.recipe,
-        totalMl:          result.mixingInstructions.totalVolumeMl,
-        })
-        setAdded(true)
-        setTimeout(() => setAdded(false), 2500)
-    }
-
-    function handleAddToCart() {
-        if (!result) return
-
-        const heart = result.mixingInstructions.recipe.find(f => f.role === 'Heart') 
-            || result.mixingInstructions.recipe[0]
-
-        addItem({
-            fragranceId:      `blend-${Date.now()}`,
-            name:             result.perfumeName,
-            emoji:            '🧪',
-            color:            heart?.color || '#B8924A',
-            imageUrl:         heart?.imageUrl || null,
-            pricePerMl:       result.pricing.totalAmount, // flat total
-            volume:           1,
-            qty:              1,
-            inStock:          true,
-            isBlend:          true,
-            isFlat:           true,
-            blendRecipe:      result.mixingInstructions,  // full mixing card
-            pricing:          result.pricing,              // ← ADD THIS
-            scentDescription: result.scentDescription,
-            blendNotes:       result.mixingInstructions.recipe.map(r => ({
-                fragranceId: r.note,
-                name:        r.note,
-                emoji:       r.emoji,
-                pricePerMl:  r.percentageNum 
-                    ? (result.pricing.fragranceCost * r.percentageNum / 100) / r.volumeMl 
-                    : 0,
-                mlUsed:      r.volumeMl,
-                role:        r.role,
-                percentage:  r.percentageNum || 0,
-            })),
-            totalMl: result.mixingInstructions.totalVolumeMl,
+        blendNotes:       result.mixingInstructions.recipe.map(r => ({
+            fragranceId: r.note,
+            name:        r.note,
+            emoji:       r.emoji,
+            pricePerMl:  r.percentageNum
+            ? (result.pricing.fragranceCost * r.percentageNum / 100) / r.volumeMl
+            : 0,
+            mlUsed:      r.volumeMl,
+            role:        r.role,
+            percentage:  r.percentageNum || 0,
+        })),
+        totalMl: result.mixingInstructions.totalVolumeMl,
         })
         setAdded(true)
         setTimeout(() => setAdded(false), 2500)
@@ -164,7 +128,7 @@ const MOOD_PROMPTS = [
             <div className="h-0.5 flex-1 bg-white/10" />
         </div>
 
-        {/* ── STEP 1: DESCRIBE ─────────────────────────────────── */}
+        {/* ── STEP 1 ── */}
         {step === 1 && (
             <section className="max-w-2xl mx-auto px-6 sm:px-8 pb-24">
             <form onSubmit={handleSubmit} className="flex flex-col gap-8">
@@ -241,72 +205,63 @@ const MOOD_PROMPTS = [
             </section>
         )}
 
-        {/* ── STEP 2: RESULT ───────────────────────────────────── */}
+        {/* ── STEP 2 ── */}
         {step === 2 && result && (
             <section className="max-w-2xl mx-auto px-6 sm:px-8 pb-24">
             {(() => {
                 const recipe = result.mixingInstructions.recipe
-                const heart = recipe.find(f => f.role === 'Heart') || recipe[0]
+                const heart  = recipe.find(f => f.role === 'Heart') || recipe[0]
                 return (
                 <>
-                {/* Blend hero — image + name + description */}
-                <div className="flex flex-col sm:flex-row items-center gap-8 mb-10">
+                    <div className="flex flex-col sm:flex-row items-center gap-8 mb-10">
                     <div className="relative w-44 h-56 sm:w-52 sm:h-64 shrink-0 overflow-hidden bg-[#1C1813]">
-                    {heart?.imageUrl ? (
-                        <Image
-                        src={heart.imageUrl}
-                        alt={result.perfumeName}
-                        fill
-                        className="object-cover object-center"
-                        />
-                    ) : (
+                        {heart?.imageUrl ? (
+                        <Image src={heart.imageUrl} alt={result.perfumeName} fill className="object-cover object-center" />
+                        ) : (
                         <div className="w-full h-full flex items-center justify-center text-6xl"
-                        style={{ backgroundColor: heart?.color || '#1C1813' }}>
-                        {heart?.emoji}
+                            style={{ backgroundColor: heart?.color || '#1C1813' }}>
+                            {heart?.emoji}
                         </div>
-                    )}
-                    {/* Colour bar showing the notes blended, weighted by their share */}
-                    <div className="absolute inset-x-0 bottom-0 flex h-1.5">
+                        )}
+                        <div className="absolute inset-x-0 bottom-0 flex h-1.5">
                         {recipe.map((f, i) => (
-                        <div key={i} style={{ backgroundColor: f.color || '#B8924A', flex: f.percentageNum }} />
+                            <div key={i} style={{ backgroundColor: f.color || '#B8924A', flex: f.percentageNum }} />
                         ))}
-                    </div>
+                        </div>
                     </div>
 
                     <div className="flex-1 text-center sm:text-left">
-                    <p className="text-xs uppercase tracking-[0.25em] text-[#B8924A] mb-2">Your Bespoke Blend</p>
-                    <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl italic mb-3">
+                        <p className="text-xs uppercase tracking-[0.25em] text-[#B8924A] mb-2">Your Bespoke Blend</p>
+                        <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl italic mb-3">
                         {result.perfumeName}
-                    </h2>
-                    <p className="text-sm text-[#F5EFE6]/60 leading-relaxed mb-3">
+                        </h2>
+                        <p className="text-sm text-[#F5EFE6]/60 leading-relaxed mb-3">
                         {result.scentDescription}
-                    </p>
+                        </p>
                     </div>
-                </div>
+                    </div>
 
-                {/* What's inside — customer-facing, no ratios */}
-                <div className="border border-white/10 p-6 mb-6">
+                    <div className="border border-white/10 p-6 mb-6">
                     <p className="text-[10px] uppercase tracking-[0.2em] text-[#F5EFE6]/40 mb-4">
-                    What's Inside · {result.mixingInstructions.totalVolumeMl}ml Blend
+                        What's Inside · {result.mixingInstructions.totalVolumeMl}ml Blend
                     </p>
                     <div className="flex flex-col gap-3">
-                    {recipe.map((f, i) => (
+                        {recipe.map((f, i) => (
                         <div key={i} className="flex items-center gap-3">
-                        <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: f.color || '#B8924A' }} />
-                        <span className="text-sm">{f.emoji} {f.note}</span>
-                        <span className="text-xs text-[#F5EFE6]/30 ml-auto">{f.category}</span>
+                            <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: f.color || '#B8924A' }} />
+                            <span className="text-sm">{f.emoji} {f.note}</span>
+                            <span className="text-xs text-[#F5EFE6]/30 ml-auto">{f.category}</span>
                         </div>
-                    ))}
+                        ))}
                     </div>
                     <p className="text-xs text-[#F5EFE6]/25 mt-4 pt-4 border-t border-white/5">
-                    Expertly blended by our perfumers into a single {result.mixingInstructions.totalVolumeMl}ml signature vial.
+                        Expertly blended by our perfumers into a single {result.mixingInstructions.totalVolumeMl}ml signature vial.
                     </p>
-                </div>
+                    </div>
                 </>
                 )
             })()}
 
-            {/* Pricing */}
             <div className="border border-white/10 p-6 mb-8">
                 <p className="text-[10px] uppercase tracking-[0.2em] text-[#F5EFE6]/40 mb-4">Price</p>
                 <div className="flex flex-col gap-2 text-sm mb-4">
@@ -331,7 +286,6 @@ const MOOD_PROMPTS = [
                 </div>
             </div>
 
-            {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-3">
                 <button onClick={handleAddToCart}
                 className={`flex-1 py-4 text-xs uppercase tracking-[0.2em] font-medium transition-colors

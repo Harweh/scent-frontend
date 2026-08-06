@@ -38,16 +38,36 @@ const ORDER_STATUSES = ['pending', 'confirmed', 'processing', 'shipped', 'delive
         .finally(() => setLoading(false))
     }, [])
 
+    // async function openCustomer(c) {
+    //     setSelected(c)
+    //     setHistoryLoading(true)
+    //     try {
+    //     const params = new URLSearchParams()
+    //     if (c.email) params.set('email', c.email)
+    //     else if (c.phone) params.set('phone', c.phone)
+    //     const data = await apiFetch(`/api/orders?${params.toString()}`, { headers: adminHeaders() })
+    //     if (data.success) setHistory(data.data)
+    //     } catch (err) { console.error(err) }
+    //     finally { setHistoryLoading(false) }
+    // }
+
     async function openCustomer(c) {
         setSelected(c)
         setHistoryLoading(true)
         try {
-        const params = new URLSearchParams()
-        if (c.email) params.set('email', c.email)
-        else if (c.phone) params.set('phone', c.phone)
-        const data = await apiFetch(`/api/orders?${params.toString()}`, { headers: adminHeaders() })
-        if (data.success) setHistory(data.data)
-        } catch (err) { console.error(err) }
+            // Do NOT send admin headers here — we want email filtering,
+            // not the full list that admin secret returns
+            const params = new URLSearchParams()
+            if (c.email) params.set('email', c.email)
+            else if (c.phone) params.set('phone', c.phone)
+            
+            const data = await apiFetch(`/api/orders?${params.toString()}`)
+            if (data.success) setHistory(data.data)
+            else setHistory([])
+        } catch (err) { 
+            console.error(err)
+            setHistory([])
+        }
         finally { setHistoryLoading(false) }
     }
 
