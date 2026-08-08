@@ -617,7 +617,7 @@ export default function AdminOrderDetailPage() {
             </div>
             )}
 
-                <div className="border border-red-500/20 p-6">
+                <div className="border mt-4 border-red-500/20 p-6">
                     <p className="text-[10px] uppercase tracking-[0.2em] text-red-400/60 mb-3">Danger Zone</p>
                     <p className="text-xs text-[#F5EFE6]/30 mb-4">
                     Permanently delete this order. This cannot be undone.
