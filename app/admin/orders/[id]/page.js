@@ -467,7 +467,7 @@ export default function AdminOrderDetailPage() {
                     {ORDER_STATUSES.map(s => <option key={s} value={s} className="bg-[#1C1813] text-white">{s}</option>)}
                 </select>
 
-                    <div className="border-t border-red-500/20 pt-4 mt-2">
+                    {/* <div className="border-t border-red-500/20 pt-4 mt-2">
                         <button
                             onClick={async () => {
                             if (!confirm(`Delete order ${order.orderId}? This cannot be undone.`)) return
@@ -482,7 +482,7 @@ export default function AdminOrderDetailPage() {
                             className="w-full py-3 text-xs uppercase tracking-[0.12em] border border-red-500/30 text-red-400/70 hover:bg-red-500/10 hover:border-red-500/60 hover:text-red-400 transition-colors">
                             Delete Order
                         </button>
-                    </div>
+                    </div> */}
 
                 </div>
 
@@ -517,7 +517,32 @@ export default function AdminOrderDetailPage() {
                     </div>
                 </div>
                 </div>
+
+                                    <div className="border border-red-500/20 p-6">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-red-400/60 mb-3">Danger Zone</p>
+                <p className="text-xs text-[#F5EFE6]/30 mb-4">
+                Permanently delete this order. This cannot be undone.
+                </p>
+                <button
+                onClick={async () => {
+                    if (!confirm(`Delete ${order.orderId}? This cannot be undone.`)) return
+                    try {
+                    const data = await apiFetch(`/api/orders/${id}`, {
+                        method: 'DELETE',
+                        headers: adminHeaders(),
+                    })
+                    if (data.success) router.push('/admin/orders')
+                    else alert('Delete failed: ' + data.message)
+                    } catch (err) { alert(err.message) }
+                }}
+                className="w-full py-3 text-xs uppercase tracking-[0.12em] border border-red-500/30 text-red-400/70 hover:bg-red-500/10 hover:border-red-500 hover:text-red-400 transition-colors"
+                >
+                Delete This Order
+                </button>
             </div>
+
+            </div>
+            
             </div>
 
             {/* ── ITEMS — full width ── */}
