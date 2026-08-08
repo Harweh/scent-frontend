@@ -616,7 +616,6 @@ export default function AdminOrderDetailPage() {
                 )}
             </div>
             )}
-        </div>
 
                 <div className="border border-red-500/20 p-6">
                     <p className="text-[10px] uppercase tracking-[0.2em] text-red-400/60 mb-3">Danger Zone</p>
@@ -640,6 +639,7 @@ export default function AdminOrderDetailPage() {
                     Delete This Order
                     </button>
                 </div>
+        </div>
         </main>
     )
 }
