@@ -22,6 +22,7 @@ export default function Navbar() {
             <Link href="/catalog" className="hover:text-[#B8924A] transition-colors">Collections</Link>
             <Link href="/customizer" className="hover:text-[#B8924A] transition-colors">Bespoke Lab</Link>
             <Link href="/orders" className="hover:text-[#B8924A] transition-colors">Orders</Link>
+            <Link href="/contact" className="hover:text-[#B8924A] transition-colors">Contact</Link>
             </nav>
 
             <div className="flex items-center gap-5">
@@ -65,7 +66,6 @@ export default function Navbar() {
             <Link href="/catalog" className="py-3 hover:text-[#B8924A] transition-colors" onClick={() => setMenuOpen(false)}>Collections</Link>
             <Link href="/customizer" className="py-3 hover:text-[#B8924A] transition-colors" onClick={() => setMenuOpen(false)}>Bespoke Lab</Link>
             <Link href="/orders" className="py-3 hover:text-[#B8924A] transition-colors" onClick={() => setMenuOpen(false)}>Orders</Link>
-            <Link href="/contact" className="hover:text-[#B8924A] transition-colors">Contact</Link>
             </nav>
         )}
         </header>
