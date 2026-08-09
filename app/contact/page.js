@@ -32,7 +32,7 @@ export default function ContactPage() {
     }
 
     return (
-        <main className="bg-[#100E0B] min-h-screen text-[#F5EFE6]">
+        <main className="bg-[#100E0B] min-h-screen mt-10 pt-10 text-[#F5EFE6]">
         <section className="border-b border-white/10">
             <div className="max-w-2xl mx-auto px-6 sm:px-8 py-14 sm:py-20 text-center">
             <p className="text-xs uppercase tracking-[0.25em] text-[#B8924A] mb-3">We're here</p>
@@ -43,7 +43,7 @@ export default function ContactPage() {
             </div>
         </section>
 
-        <div className="max-w-4xl mx-auto px-6 sm:px-8 py-12 grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-12">
+        <div className="max-w-4xl mx-auto  px-6 sm:px-8 py-12 grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-12">
 
             {/* Form */}
             <div>
@@ -55,7 +55,7 @@ export default function ContactPage() {
                 </div>
             ) : (
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex-1 bg-white/5 border border-white/15 px-5 py-3.5 text-sm focus:outline-none focus:border-[#B8924A]">
                     <input required placeholder="Your Name" value={form.name}
                     onChange={e => update('name', e.target.value)}
                     className="bg-white/5 border border-white/15 px-5 py-3.5 text-sm focus:outline-none focus:border-[#B8924A] transition-colors" />
@@ -89,7 +89,7 @@ export default function ContactPage() {
             {[
                 { label: 'Email', value: 'hello@auraluxe.com', icon: '✉️' },
                 { label: 'WhatsApp', value: '+234 800 000 0000', icon: '💬' },
-                { label: 'Studio Hours', value: 'Mon–Sat, 9am–6pm WAT', icon: '🕐' },
+                { label: 'Studio Hours', value: 'Mon–Sat, 8am–5pm WAT', icon: '🕐' },
                 { label: 'Location', value: 'Lagos, Nigeria', icon: '📍' },
             ].map(item => (
                 <div key={item.label} className="flex gap-4 items-start">
