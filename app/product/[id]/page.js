@@ -116,7 +116,7 @@ export default function ProductDetailPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-start">
 
             {/* LEFT — Image */}
-            <div className="relative aspect-[3/4] overflow-hidden bg-[#1C1813] md:sticky md:top-28">
+            {/* <div className="relative aspect-[3/4] overflow-hidden bg-[#1C1813] md:sticky md:top-28">
                 {imageUrl ? (
                 <Image
                     src={imageUrl}
@@ -133,8 +133,21 @@ export default function ProductDetailPage() {
                     {emoji}
                 </div>
                 )}
+            </div> */}
 
-                              {/* Sub images gallery */}
+                        {/* LEFT — Image */}
+                <div className="flex flex-col gap-3 md:sticky md:top-28">
+                <div className="relative aspect-[3/4] overflow-hidden bg-[#1C1813]">
+                    {imageUrl ? (
+                    <Image src={selectedImage || imageUrl} alt={name} fill priority className="object-cover object-center" />
+                    ) : (
+                    <div className="w-full h-full flex items-center justify-center text-8xl"
+                        style={{ backgroundColor: color || '#1C1813' }}>
+                        {emoji}
+                    </div>
+                    )}
+                </div>
+                {/* Sub images gallery */}
                 {fragrance.subImages?.length > 0 && (
                     <div className="flex gap-2 overflow-x-auto">
                     <button onClick={() => setSelectedImage(imageUrl)}
@@ -149,9 +162,9 @@ export default function ProductDetailPage() {
                     ))}
                     </div>
                 )}
-            </div>
+                </div>
+ 
 
-            </div>
 
             {/* RIGHT — Info */}
             <div className="flex flex-col gap-8 pt-2">
