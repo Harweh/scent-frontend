@@ -342,7 +342,7 @@ import Link from 'next/link'
 import { apiFetch } from '@/lib/api'
 
 const ADMIN_SECRET   = process.env.NEXT_PUBLIC_ADMIN_SECRET || 'aura-admin-2026'
-const adminHeaders   = () => ({ 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET })
+const adminHeaders   = () => ({ 'Content-Type': 'application/json', 'x-admin-secret': process.env.NEXT_PUBLIC_ADMIN_SECRET || 'aura-admin-2026' })
 const ORDER_STATUSES = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled']
 
 const statusColor = s => ({
