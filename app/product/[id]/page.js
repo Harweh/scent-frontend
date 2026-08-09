@@ -133,7 +133,6 @@ export default function ProductDetailPage() {
                     {emoji}
                 </div>
                 )}
-                
             </div>
 
             {/* RIGHT — Info */}
