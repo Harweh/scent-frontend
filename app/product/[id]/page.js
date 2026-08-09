@@ -133,6 +133,24 @@ export default function ProductDetailPage() {
                     {emoji}
                 </div>
                 )}
+
+                              {/* Sub images gallery */}
+                {fragrance.subImages?.length > 0 && (
+                    <div className="flex gap-2 overflow-x-auto">
+                    <button onClick={() => setSelectedImage(imageUrl)}
+                        className={`relative w-16 h-16 shrink-0 overflow-hidden border-2 transition-colors ${!selectedImage || selectedImage === imageUrl ? 'border-[#B8924A]' : 'border-white/15'}`}>
+                        <Image src={imageUrl} alt={name} fill className="object-cover" />
+                    </button>
+                    {fragrance.subImages.map((url, i) => (
+                        <button key={i} onClick={() => setSelectedImage(url)}
+                        className={`relative w-16 h-16 shrink-0 overflow-hidden border-2 transition-colors ${selectedImage === url ? 'border-[#B8924A]' : 'border-white/15'}`}>
+                        <Image src={url} alt={`${name} ${i + 1}`} fill className="object-cover" />
+                        </button>
+                    ))}
+                    </div>
+                )}
+            </div>
+
             </div>
 
             {/* RIGHT — Info */}
