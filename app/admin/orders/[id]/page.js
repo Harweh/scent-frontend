@@ -617,7 +617,7 @@ export default function AdminOrderDetailPage() {
             </div>
             )}
 
-                <div className="border mt-4 border-red-500/20 p-6">
+                {/* <div className="border mt-4 border-red-500/20 p-6">
                     <p className="text-[10px] uppercase tracking-[0.2em] text-red-400/60 mb-3">Danger Zone</p>
                     <p className="text-xs text-[#F5EFE6]/30 mb-4">
                     Permanently delete this order. This cannot be undone.
@@ -637,6 +637,27 @@ export default function AdminOrderDetailPage() {
                     className="w-full py-3 text-xs uppercase tracking-[0.12em] border border-red-500/30 text-red-400/70 hover:bg-red-500/10 hover:border-red-500 hover:text-red-400 transition-colors"
                     >
                     Delete This Order
+                    </button>
+                </div> */}
+                <div className="border mt-4 border-red-500/20 p-6">
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-red-400/60 mb-3">Cancel Order</p>
+                    <p className="text-xs text-[#F5EFE6]/30 mb-4">
+                        Mark this order as cancelled. The record is kept for your history.
+                    </p>
+                    <button
+                        disabled={order.status === 'cancelled'}
+                        onClick={async () => {
+                        if (!confirm(`Cancel ${order.orderId}?`)) return
+                        const data = await apiFetch(`/api/orders/${id}`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json', 'x-admin-secret': process.env.NEXT_PUBLIC_ADMIN_SECRET || 'aura-admin-2026' },
+                            body: JSON.stringify({ status: 'cancelled' }),
+                        })
+                        if (data.success) setOrder(data.data)
+                        else alert(data.message)
+                        }}
+                        className="w-full py-3 text-xs uppercase tracking-[0.12em] border border-red-500/30 text-red-400/70 hover:bg-red-500/10 hover:text-red-400 transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+                        {order.status === 'cancelled' ? 'Already Cancelled' : 'Cancel This Order'}
                     </button>
                 </div>
         </div>
